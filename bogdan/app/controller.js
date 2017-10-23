@@ -73,20 +73,14 @@ var alarmController = (function() {
         return new Days();
       })();
       $scope.daysArray = $scope.days.getSelected();
-      var changedByUser = false;
-      $scope.setChangeByUser = function() {
-        changedByUser = true;
-      };
-      $scope.toggleAllClick = function() {
-        $scope.days.toggleAll();
-        changedByUser = true;
-      };
+      var daysArrayChanged = false;
+      var daysChanged = false;
       $scope.$watch('daysArray', function(newValue, oldValue, scope) {
-        if (changedByUser) {
-          changedByUser = false;
-        } else {
+        if (daysArrayChanged) {
+          daysArrayChanged = false;
           return;
         }
+        daysChanged = true;
         var smallerArr;
         var biggerArr;
         newValue.length > oldValue.length ?
@@ -99,11 +93,11 @@ var alarmController = (function() {
         }
       }, true);
       $scope.$watch('days', function(newValue, oldValue, scope) {
-        if (changedByUser) {
-          changedByUser = false;
-        } else {
+        if (daysChanged) {
+          daysChanged = false;
           return;
         }
+        daysArrayChanged = true;
         for (var day in oldValue) {
           if (oldValue.hasOwnProperty(day) &&
             typeof oldValue[day] === 'boolean' &&

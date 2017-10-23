@@ -12,43 +12,43 @@
         <h2>Days of week</h2>
         <md-checkbox ng-checked="days.allSelected()"
                      md-indeterminate="days.someSelected()"
-                     ng-click="toggleAllClick()">
+                     ng-click="days.toggleAll()">
             <span ng-show="!days.allSelected()">Select</span><span ng-show="days.allSelected()">Deselect</span> all
         </md-checkbox>
         <div layout="row">
             <div layout="column">
                 <label for="MON">MON</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Monday" id="MON" aria-label="MON"></md-checkbox>
+                <md-checkbox ng-model="days.Monday" id="MON" aria-label="MON"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="TUE">TUE</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Tuesday" id="TUE" aria-label="TUE"></md-checkbox>
+                <md-checkbox ng-model="days.Tuesday" id="TUE" aria-label="TUE"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="WED">WED</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Wednesday" id="WED" aria-label="WED"></md-checkbox>
+                <md-checkbox ng-model="days.Wednesday" id="WED" aria-label="WED"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="THU">THU</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Thursday" id="THU" aria-label="THU"></md-checkbox>
+                <md-checkbox ng-model="days.Thursday" id="THU" aria-label="THU"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="FRI">FRI</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Friday" id="FRI" aria-label="FRI"></md-checkbox>
+                <md-checkbox ng-model="days.Friday" id="FRI" aria-label="FRI"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="SAT">SAT</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Saturday" id="SAT" aria-label="SAT"></md-checkbox>
+                <md-checkbox ng-model="days.Saturday" id="SAT" aria-label="SAT"></md-checkbox>
             </div>
             <div layout="column">
                 <label for="SUN">SUN</label>
-                <md-checkbox ng-click="setChangeByUser()" ng-model="days.Sunday" id="SUN" aria-label="SUN"></md-checkbox>
+                <md-checkbox ng-model="days.Sunday" id="SUN" aria-label="SUN"></md-checkbox>
             </div>
         </div>
         <md-input-container>
             <label>Days</label>
             <md-select ng-model="daysArray" multiple>
-                <md-option ng-click="setChangeByUser()" ng-repeat="(day, value) in days" ng-value="day">{{day}}</md-option>
+                <md-option ng-repeat="(day, value) in days" ng-value="day">{{day}}</md-option>
             </md-select>
         </md-input-container>
     </div>
