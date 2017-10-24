@@ -208,7 +208,6 @@ var alarmController = (function() {
           contentElement: '#testDialog',
           parent: angular.element(document.body),
           targetEvent: event,
-          clickOutsideToClose: true,
           fullscreen: true
         });
       };

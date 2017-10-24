@@ -5,3 +5,6 @@
 .dialog-template {
     display: none;
 }
+#alarmDialog {
+    min-width: 50%;
+}
