@@ -1,6 +1,6 @@
 var alarmController = (function() {
     'use strict';
-    return function($scope, $interval) {
+    return function($scope, $mdDialog) {
       if (!Object.create) {
         Object.create = function inherit(proto) {
           function F() {}
@@ -76,12 +76,18 @@ var alarmController = (function() {
           return '[object Days]';
         }
       });
-      function AlarmClock(time, days) {
+      function AlarmClock(time, days, name, isTurnedOn) {
         if (Object.prototype.toString.call(time) !== '[object Date]') {
           throw new TypeError('Time must be a Date instance');
         }
         if (isNaN(time.valueOf())) {
           throw new TypeError('Time is invalid');
+        }
+        if (typeof name !== 'string') {
+          throw new TypeError('Name must be a string');
+        }
+        if (isTurnedOn && typeof isTurnedOn !== 'boolean') {
+          throw new TypeError('isTurnedOn must be a boolean value');
         }
         var isArray = Object.prototype.toString.call(days) !== '[object Array]';
         if (isArray || typeof days === 'object' &&
@@ -96,14 +102,28 @@ var alarmController = (function() {
         } else {
           daysArray = days.getValues();
         }
-        this.getTimeString = function() {
-          return AlarmClock.formatNumber(time.getHours) + ':' +
-            AlarmClock.formatNumber(time.getMinutes());
-        };
-        this.getDaysArray = function() {
-          return daysArray.slice();
+        return {
+          name: name,
+          getTimeString: function() {
+            return AlarmClock.formatNumber(time.getHours) + ':' +
+              AlarmClock.formatNumber(time.getMinutes());
+          },
+          getDaysArray: function() {
+            return daysArray.slice();
+          },
+          toggle: function() {
+            return isTurnedOn = !isTurnedOn;
+          },
+          isTurnedOn: function() {
+            return isTurnedOn;
+          }
         };
       }
+      AlarmClock.prototype = Object.create({
+        toString: function() {
+          return '[object AlarmClock]';
+        }
+      });
       AlarmClock.formatNumber = function(num) {
         var str = num + '';
         return str.length > 1 ? str : '0' + str;
@@ -183,5 +203,17 @@ var alarmController = (function() {
       $scope.$watch('minutes', function(newVal, oldVal, scope) {
         scope.time = setTime();
       });
+      $scope.openDialog = function(event, action) {
+        $mdDialog.show({
+          contentElement: '#testDialog',
+          parent: angular.element(document.body),
+          targetEvent: event,
+          clickOutsideToClose: true,
+          fullscreen: true
+        });
+      };
+      $scope.closeDialog = function(event, action) {
+        $mdDialog.hide();
+      };
     };
   })();

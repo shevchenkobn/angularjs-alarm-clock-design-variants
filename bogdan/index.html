@@ -4,119 +4,145 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="./node_modules/angular-material/angular-material.css">
     <link rel="stylesheet" href="./node_modules/mdPickers/dist/mdPickers.min.css">
+    <link rel="stylesheet" href="./app/styles.css">
 </head>
 <body ng-app="alarmClock">
 
 <div ng-controller="alarmController">
-    <div layout="column">
-        <h2>Days of week</h2>
-        <md-checkbox ng-checked="days.allSelected()"
-                     md-indeterminate="days.someSelected()"
-                     ng-click="days.toggleAll()">
-            <span ng-show="!days.allSelected()">Select</span><span ng-show="days.allSelected()">Deselect</span> all
-        </md-checkbox>
-        <div layout="row">
-            <div layout="column">
-                <label for="MON">MON</label>
-                <md-checkbox ng-model="days.Monday" id="MON" aria-label="MON"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="TUE">TUE</label>
-                <md-checkbox ng-model="days.Tuesday" id="TUE" aria-label="TUE"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="WED">WED</label>
-                <md-checkbox ng-model="days.Wednesday" id="WED" aria-label="WED"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="THU">THU</label>
-                <md-checkbox ng-model="days.Thursday" id="THU" aria-label="THU"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="FRI">FRI</label>
-                <md-checkbox ng-model="days.Friday" id="FRI" aria-label="FRI"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="SAT">SAT</label>
-                <md-checkbox ng-model="days.Saturday" id="SAT" aria-label="SAT"></md-checkbox>
-            </div>
-            <div layout="column">
-                <label for="SUN">SUN</label>
-                <md-checkbox ng-model="days.Sunday" id="SUN" aria-label="SUN"></md-checkbox>
-            </div>
+
+    <div class="dialog-template">
+        <div class="md-dialog-container" id="testDialog">
+            <md-dialog layout-padding>
+                <md-dialog-content>
+                    <h2>Days of week</h2>
+                    <md-tabs>
+                        <md-tab label="Checkboxes" layout="column" layout-padding>
+                            <md-checkbox ng-checked="days.allSelected()"
+                                         md-indeterminate="days.someSelected()"
+                                         ng-click="days.toggleAll()">
+                                <span ng-show="!days.allSelected()">Select</span><span ng-show="days.allSelected()">Deselect</span> all
+                            </md-checkbox>
+                            <div layout="row" layout-padding>
+                                <div layout="column">
+                                    <label for="MON">MON</label>
+                                    <md-checkbox ng-model="days.Monday" id="MON" aria-label="MON"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="TUE">TUE</label>
+                                    <md-checkbox ng-model="days.Tuesday" id="TUE" aria-label="TUE"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="WED">WED</label>
+                                    <md-checkbox ng-model="days.Wednesday" id="WED" aria-label="WED"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="THU">THU</label>
+                                    <md-checkbox ng-model="days.Thursday" id="THU" aria-label="THU"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="FRI">FRI</label>
+                                    <md-checkbox ng-model="days.Friday" id="FRI" aria-label="FRI"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="SAT">SAT</label>
+                                    <md-checkbox ng-model="days.Saturday" id="SAT" aria-label="SAT"></md-checkbox>
+                                </div>
+                                <div layout="column">
+                                    <label for="SUN">SUN</label>
+                                    <md-checkbox ng-model="days.Sunday" id="SUN" aria-label="SUN"></md-checkbox>
+                                </div>
+                            </div>
+                        </md-tab>
+                        <md-tab label="Select"  layout="column" layout-padding>
+                            <md-checkbox ng-checked="days.allSelected()"
+                                         md-indeterminate="days.someSelected()"
+                                         ng-click="days.toggleAll()">
+                                <span ng-show="!days.allSelected()">Select</span><span ng-show="days.allSelected()">Deselect</span> all
+                            </md-checkbox>
+                            <md-input-container>
+                                <label>Days</label>
+                                <md-select ng-model="daysArray" multiple>
+                                    <md-option ng-repeat="(day, value) in days" ng-value="day">{{day}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </md-tab>
+                    </md-tabs>
+                    <div layout-gt-xs="row" layout-xs="column">
+                        <form name="clockForm">
+                            <mdp-time-picker ng-model="time"></mdp-time-picker>
+                        </form>
+                        <form name="rangeForm" layout="row" layout-padding>
+                            <md-slider-container flex md-vertical>
+                                <md-input-container>
+                                    <input    flex
+                                              aria-label="hours"
+                                              type="number"
+                                              min="0"
+                                              ng-min="0"
+                                              max="23"
+                                              ng-max="23"
+                                              aria-controls="hours-slider"
+                                              ng-model="hours"/>
+                                </md-input-container>
+                                <md-slider ng-model="hours"
+                                           min="0"
+                                           max="23"
+                                           aria-label="hours"
+                                           id="hours-slider"
+                                           md-vertical
+                                           md-range
+                                           flex></md-slider>
+                                <h5>Hours</h5>
+                            </md-slider-container>
+                            <md-slider-container flex md-vertical>
+                                <md-input-container>
+                                    <input    flex
+                                              aria-label="minutes"
+                                              type="number"
+                                              min="0"
+                                              ng-min="0"
+                                              max="59"
+                                              ng-max="59"
+                                              aria-controls="minutes-slider"
+                                              ng-model="minutes"/>
+                                </md-input-container>
+                                <md-slider ng-model="minutes"
+                                           min="0"
+                                           max="59"
+                                           aria-label="minutes"
+                                           id="minutes-slider"
+                                           md-vertical
+                                           md-range
+                                           flex></md-slider>
+                                <h5>Minutes</h5>
+                            </md-slider-container>
+                        </form>
+                        <form name="selectForm" layout="row" layout-padding>
+                            <md-input-container>
+                                <label>Hours</label>
+                                <md-select ng-model="hours" placeholder="00">
+                                    <md-option ng-repeat="num in getHoursRange()" ng-value="num">{{formatNumber(num)}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Minutes</label>
+                                <md-select ng-model="minutes" placeholder="00">
+                                    <md-option ng-repeat="num in getMinutesRange()" ng-value="num">{{formatNumber(num)}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </form>
+                    </div>
+                </md-dialog-content>
+                <md-dialog-actions>
+                    <md-button ng-click="closeDialog($event, 'save')" class="md-primary">Save alarm</md-button>
+                    <md-button ng-click="closeDialog($event, 'cancel')">Cancel</md-button>
+                </md-dialog-actions>
+            </md-dialog-content>
         </div>
-        <md-input-container>
-            <label>Days</label>
-            <md-select ng-model="daysArray" multiple>
-                <md-option ng-repeat="(day, value) in days" ng-value="day">{{day}}</md-option>
-            </md-select>
-        </md-input-container>
     </div>
-    <div layout-gt-xs="row" layout-xs="column">
-        <form name="clockForm">
-            <mdp-time-picker ng-model="time"></mdp-time-picker>
-        </form>
-        <form name="rangeForm" layout="row" layout-padding>
-            <md-slider-container flex md-vertical>
-                <md-input-container>
-                    <input    flex
-                              aria-label="hours"
-                              type="number"
-                              min="0"
-                              ng-min="0"
-                              max="23"
-                              ng-max="23"
-                              aria-controls="hours-slider"
-                              ng-model="hours"/>
-                </md-input-container>
-                <md-slider ng-model="hours"
-                           min="0"
-                           max="23"
-                           aria-label="hours"
-                           id="hours-slider"
-                           md-vertical
-                           md-range
-                           flex></md-slider>
-                <h5>Hours</h5>
-            </md-slider-container>
-            <md-slider-container flex md-vertical>
-                <md-input-container>
-                    <input    flex
-                              aria-label="minutes"
-                              type="number"
-                              min="0"
-                              ng-min="0"
-                              max="59"
-                              ng-max="59"
-                              aria-controls="minutes-slider"
-                              ng-model="minutes"/>
-                </md-input-container>
-                <md-slider ng-model="minutes"
-                           min="0"
-                           max="59"
-                           aria-label="minutes"
-                           id="minutes-slider"
-                           md-vertical
-                           md-range
-                           flex></md-slider>
-                <h5>Minutes</h5>
-            </md-slider-container>
-        </form>
-        <form name="selectForm" layout="row" layout-padding>
-            <md-input-container>
-                <label>Hours</label>
-                <md-select ng-model="hours" placeholder="00">
-                    <md-option ng-repeat="num in getHoursRange()" ng-value="num">{{formatNumber(num)}}</md-option>
-                </md-select>
-            </md-input-container>
-            <md-input-container>
-                <label>Minutes</label>
-                <md-select ng-model="minutes" placeholder="00">
-                    <md-option ng-repeat="num in getMinutesRange()" ng-value="num">{{formatNumber(num)}}</md-option>
-                </md-select>
-            </md-input-container>
-        </form>
-    </div>
+    <md-button class="md-fab" ng-click="openDialog($event)">
+        <img src="./images/add-alarm.png">
+    </md-button>
 </div>
 <script src="./node_modules/angular/angular.js"></script>
 <script src="./node_modules/angular-aria/angular-aria.js"></script>
