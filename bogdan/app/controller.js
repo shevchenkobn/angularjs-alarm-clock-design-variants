@@ -1,77 +1,114 @@
 var alarmController = (function() {
     'use strict';
-    return function($scope) {
-      $scope.days = (function() {
-        if (!Object.create) {
-          Object.create = function inherit(proto) {
-            function F() {}
-            F.prototype = proto;
-            var object = new F();
-            return object;
-          };
-        }
-        function Days() {
-          this.Monday = false,
-            this.Tuesday = false,
-            this.Wednesday = false,
-            this.Thursday = false,
-            this.Friday = false,
-            this.Saturday = false,
-            this.Sunday = false;
-        }
-        Days.prototype = Object.create({
-          toggleAll: function() {
-            var newValue = !this.allSelected();
-            for (var day in this) {
-              if (this.hasOwnProperty(day) && typeof this[day] === 'boolean') {
-                this[day] = newValue;
-              }
+    return function($scope, $interval) {
+      if (!Object.create) {
+        Object.create = function inherit(proto) {
+          function F() {}
+          F.prototype = proto;
+          var object = new F();
+          return object;
+        };
+      }
+      function Days(array) {
+        this.Monday = false,
+          this.Tuesday = false,
+          this.Wednesday = false,
+          this.Thursday = false,
+          this.Friday = false,
+          this.Saturday = false,
+          this.Sunday = false;
+        if (Object.prototype.toString.call(array) === '[object Array]') {
+          for (var i = 0; i < array.length; i++) {
+            if (this.hasOwnProperty(array[i])) {
+              this[array[i]] = true;
             }
-          },
-          someSelected: function() {
-            var selectedCount = 0;
-            for (var day in this) {
-              if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
-                this[day]) {
-                selectedCount++;
-              }
-            }
-            return selectedCount > 0 && selectedCount < 7;
-          },
-          allSelected: function() {
-            for (var day in this) {
-              if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
-                !this[day]) {
-                return false;
-              }
-            }
-            return true;
-          },
-          toggle: function(day) {
-            this[day] = !this[day];
-          },
-          getValues: function() {
-            var values = [];
-            for (var day in this) {
-              if (this.hasOwnProperty(day) && typeof this[day] === 'boolean') {
-                values.push(day);
-              }
-            }
-            return values;
-          },
-          getSelected: function() {
-            var values = [];
-            for (var day in this) {
-              if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
-                this[day]) {
-                values.push(day);
-              }
-            }
-            return values;
           }
-        });
-        return new Days();
-      })();
+        }
+      }
+      Days.prototype = Object.create({
+        toggleAll: function() {
+          var newValue = !this.allSelected();
+          for (var day in this) {
+            if (this.hasOwnProperty(day) && typeof this[day] === 'boolean') {
+              this[day] = newValue;
+            }
+          }
+        },
+        someSelected: function() {
+          var selectedCount = 0;
+          for (var day in this) {
+            if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
+              this[day]) {
+              selectedCount++;
+            }
+          }
+          return selectedCount > 0 && selectedCount < 7;
+        },
+        allSelected: function() {
+          for (var day in this) {
+            if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
+              !this[day]) {
+              return false;
+            }
+          }
+          return true;
+        },
+        getValues: function() {
+          var values = [];
+          for (var day in this) {
+            if (this.hasOwnProperty(day) && typeof this[day] === 'boolean') {
+              values.push(day);
+            }
+          }
+          return values;
+        },
+        getSelected: function() {
+          var values = [];
+          for (var day in this) {
+            if (this.hasOwnProperty(day) && typeof this[day] === 'boolean' &&
+              this[day]) {
+              values.push(day);
+            }
+          }
+          return values;
+        },
+        toString: function() {
+          return '[object Days]';
+        }
+      });
+      function AlarmClock(time, days) {
+        if (Object.prototype.toString.call(time) !== '[object Date]') {
+          throw new TypeError('Time must be a Date instance');
+        }
+        if (isNaN(time.valueOf())) {
+          throw new TypeError('Time is invalid');
+        }
+        var isArray = Object.prototype.toString.call(days) !== '[object Array]';
+        if (isArray || typeof days === 'object' &&
+          !(days.toString() === '[object Days]' ||
+          days.getValues)) {
+          throw new TypeError('Days must be a Days instance');
+        }
+        var daysArray;
+        if (isArray) {
+          daysArray = days;
+          days = new Days(days);
+        } else {
+          daysArray = days.getValues();
+        }
+        this.getTimeString = function() {
+          return AlarmClock.formatNumber(time.getHours) + ':' +
+            AlarmClock.formatNumber(time.getMinutes());
+        };
+        this.getDaysArray = function() {
+          return daysArray.slice();
+        };
+      }
+      AlarmClock.formatNumber = function(num) {
+        var str = num + '';
+        return str.length > 1 ? str : '0' + str;
+      };
+      $scope.days = new Days();
       $scope.daysArray = $scope.days.getSelected();
       var daysArrayChanged = false;
       var daysChanged = false;
@@ -133,10 +170,7 @@ var alarmController = (function() {
       $scope.getMinutesRange = function() {
         return getNumberRange(0, 59);
       };
-      $scope.formatNumber = function(num) {
-        var str = num + '';
-        return str.length > 1 ? str : '0' + str;
-      };
+      $scope.formatNumber = AlarmClock.formatNumber;
       $scope.$watch('time.getHours()', function(newVal, oldVal, scope) {
         scope.hours = newVal;
       });
