@@ -14,7 +14,7 @@
         <div class="md-dialog-container" id="testDialog">
             <md-dialog layout-padding id="alarmDialog">
                 <md-dialog-content>
-                    <md-tabs>
+                    <md-tabs md-dynamic-height>
                         <md-tab label="Checkboxes" layout="column" layout-padding>
                             <md-checkbox ng-checked="days.allSelected()"
                                          md-indeterminate="days.someSelected()"
@@ -46,7 +46,7 @@
                             </md-input-container>
                         </md-tab>
                     </md-tabs>
-                    <md-tabs class="md-title md-block">
+                    <md-tabs class="md-title md-block" md-dynamic-height >
                         <md-tab label="Clock Picker" layout-padding>
                             <form name="clockForm">
                                 <mdp-time-picker ng-model="time"></mdp-time-picker>
