@@ -83,40 +83,56 @@ var alarmController = (function() {
         if (isNaN(time.valueOf())) {
           throw new TypeError('Time is invalid');
         }
+        time = new Date(time);
         if (typeof name !== 'string') {
           throw new TypeError('Name must be a string');
         }
         if (isTurnedOn && typeof isTurnedOn !== 'boolean') {
           throw new TypeError('isTurnedOn must be a boolean value');
         }
-        var isArray = Object.prototype.toString.call(days) !== '[object Array]';
-        if (isArray || typeof days === 'object' &&
-          !(days.toString() === '[object Days]' ||
-          days.getValues)) {
-          throw new TypeError('Days must be a Days instance');
+        var isArray = Object.prototype.toString.call(days) === '[object Array]';
+        if (!(isArray || typeof days === 'object' &&
+          (days.toString() === '[object Days]' ||
+          days.getValues))) {
+          throw new TypeError('Days must be a Days instance or an array');
         }
         var daysArray;
         if (isArray) {
-          daysArray = days;
+          daysArray = days.slice();
           days = new Days(days);
         } else {
-          daysArray = days.getValues();
+          daysArray = days.getSelected();
+          days = new Days(daysArray);
+        }
+        function getTimeString(arg) {
+          if (arg === undefined) {
+            arg = time;
+          }
+          return AlarmClock.formatNumber(time.getHours()) + ':' +
+            AlarmClock.formatNumber(time.getMinutes());
+        }
+        function getDaysArray(crop, length) {
+          var arrayCopy = [];
+          if (!daysArray.length) {
+            arrayCopy.push('Next time');
+          }
+          if (crop) {
+            for (var i = 0; i < daysArray.length; i++) {
+              arrayCopy.push(AlarmClock.cropDay(daysArray[i], length));
+            }
+          } else {
+            arrayCopy = daysArray.slice();
+          }
+          return arrayCopy;
         }
         return {
           name: name,
-          getTimeString: function() {
-            return AlarmClock.formatNumber(time.getHours) + ':' +
-              AlarmClock.formatNumber(time.getMinutes());
-          },
-          getDaysArray: function() {
-            return daysArray.slice();
-          },
-          toggle: function() {
-            return isTurnedOn = !isTurnedOn;
-          },
-          isTurnedOn: function() {
-            return isTurnedOn;
-          }
+          isTurnedOn: isTurnedOn,
+          getHours: time.getHours.bind(time),
+          getMinutes: time.getMinutes.bind(time),
+          timeString: getTimeString(),
+          getDaysArray: getDaysArray,
+          croppedDaysArray: getDaysArray(true, 3)
         };
       }
       AlarmClock.prototype = Object.create({
@@ -128,8 +144,17 @@ var alarmController = (function() {
         var str = num + '';
         return str.length > 1 ? str : '0' + str;
       };
+      AlarmClock.cropDay = function(day, length) {
+        if (typeof length === 'undefined') {
+          length = 3;
+        }
+        return day.slice(0, length).toUpperCase();
+      };
+      $scope.alarmName = '';
+      $scope.isTurnedOn = true;
       $scope.days = new Days();
       $scope.daysArray = $scope.days.getSelected();
+      $scope.cropDay = AlarmClock.cropDay;
       var daysArrayChanged = false;
       var daysChanged = false;
       $scope.$watch('daysArray', function(newValue, oldValue, scope) {
@@ -173,8 +198,10 @@ var alarmController = (function() {
       $scope.time = setTime();
       function setTime() {
         var date = new Date();
-        date.setHours($scope.hours);
-        date.setMinutes($scope.minutes);
+        !isNaN(+$scope.hours) ? date.setHours($scope.hours) :
+          date.setHours(0);
+        !isNaN(+$scope.minutes) ? date.setMinutes($scope.minutes) :
+          date.setMinutes(0);
         return date;
       }
       function getNumberRange(min, max) {
@@ -203,15 +230,71 @@ var alarmController = (function() {
       $scope.$watch('minutes', function(newVal, oldVal, scope) {
         scope.time = setTime();
       });
-      $scope.openDialog = function(event, action) {
+      $scope.alarmList = [new AlarmClock(setTime(), ['Monday', 'Tuesday', 'Friday'],
+        'Alarm name', $scope.isTurnedOn)];
+      var editAlarm = {
+        set: function(option) {
+          this.index = option;
+          $scope.hours = $scope.alarmList[option].getHours();
+          $scope.minutes = $scope.alarmList[option].getMinutes();
+          daysArrayChanged = false;// for resolving watchers' circular dependency
+          $scope.daysArray = $scope.alarmList[option].getDaysArray();
+          $scope.alarmName = $scope.alarmList[option].name;
+          $scope.isTurnedOn = $scope.alarmList[option].isTurnedOn;
+        },
+        save: function() {
+          $scope.alarmList[this.index] = new AlarmClock($scope.time, $scope.days,
+            $scope.alarmName, $scope.isTurnedOn);
+          delete this.index;
+        },
+        index: undefined
+      };
+      $scope.dialogAction = '';
+      $scope.openDialog = function(event, action, index) {
+        switch (action) {
+          case 'new':
+            $scope.dialogAction = 'Add new alarm';
+            break;
+          case 'edit':
+            $scope.dialogAction = 'Edit alarm clock';
+            editAlarm.set(index);
+            break;
+          case 'remove':
+            var name = $scope.alarmList[index].name ? ' with name "' +
+              $scope.alarmList[index].name + '"' : '';
+            var confirm = $mdDialog.confirm()
+              .targetEvent(event)
+              .title('Alarm removing')
+              .textContent('Are you sure you want to remove ' +
+                'alarm #' + index + name + '?')
+              .ok('Remove')
+              .cancel('cancel');
+            $mdDialog.show(confirm)
+              .then(function() { $scope.alarmList.splice(index, 1); });
+            return;
+        }
         $mdDialog.show({
-          contentElement: '#testDialog',
+          contentElement: '#mainDialog',
           parent: angular.element(document.body),
           targetEvent: event,
           fullscreen: true
         });
       };
       $scope.closeDialog = function(event, action) {
+        switch (action) {
+          case 'save':
+            if (typeof editAlarm.index === 'number') {
+              editAlarm.save();
+            } else {
+              $scope.alarmList.push(new AlarmClock($scope.time, $scope.days,
+                $scope.alarmName, $scope.isTurnedOn));
+            }
+            break;
+          // default:
+          //   if (typeof editAlarm.index === 'number') {
+          //     $scope.alarmList[editAlarm.index];
+          //   }
+        }
         $mdDialog.hide();
       };
     };

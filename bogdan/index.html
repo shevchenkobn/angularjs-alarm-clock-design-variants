@@ -9,11 +9,66 @@
 <body ng-app="alarmClock">
 
 <div ng-controller="alarmController">
+    <md-toolbar class="body-header">
+        <div layout="row" layout-margin>
+            <img src="./images/enable-alarm.png">
+            <h2>Alarm Manager</h2>
+        </div>
+    </md-toolbar>
 
+    <md-button class="md-fab md-fab-bottom-right" ng-click="openDialog($event, 'new')">
+        <img src="./images/add-alarm.png">
+    </md-button>
+    <md-content layout-padding>
+        <md-grid-list md-cols-sm="2" md-cols-md="3" md-cols-lg="4" md-cols-gt-lg="6" md-gutter="1rem" md-row-height="1.3:1">
+            <md-grid-tile ng-repeat="(index, alarm) in alarmList" md-whiteframe="6" layout="column" class="alarm-tile" layout-padding>
+                <div layout-fill layout="column">
+                    <div layout="row">
+                        <h2>#{{index}}</h2>
+                        <h3 flex md-truncate>{{alarm.name}}</h3>
+                        <span flex></span>
+                        <md-switch ng-model="alarm.isTurnedOn"></md-switch>
+                    </div>
+                    <div layout="column" style="padding-bottom: auto">
+                        <h1 ng-bind="alarm.timeString"></h1>
+                        <md-chips readonly="true" ng-model="alarm.croppedDaysArray" md-max-chips="7"></md-chips>
+                    </div>
+                    <div layout="row" class="footer">
+                        <md-button class="md-icon-button edit" ng-click="openDialog($event, 'edit', index)">
+                            <img src="./images/edit-alarm.png">
+                        </md-button>
+                        <span flex></span>
+                        <md-button class="md-icon-button delete" ng-click="openDialog($event, 'remove', index)">
+                            <img src="./images/remove-alarm.png">
+                        </md-button>
+                    </div>
+                </div>
+            </md-grid-tile>
+            <md-grid-tile md-whiteframe="6">
+                <md-button class="md-fab" ng-click="openDialog($event, 'new')">
+                    <img src="./images/add-alarm.png">
+                </md-button>
+            </md-grid-tile>
+        </md-grid-list>
+    </md-content>
     <div class="dialog-template">
-        <div class="md-dialog-container" id="testDialog">
-            <md-dialog layout-padding id="alarmDialog">
-                <md-dialog-content>
+        <div class="md-dialog-container" id="mainDialog">
+            <md-dialog id="alarmDialog">
+                <md-toolbar>
+                    <div class="md-toolbar-tools">
+                        <h2 ng-bind="dialogAction"></h2>
+                        <span flex></span>
+                        <md-button class="md-icon-button" ng-click="closeDialog($event, 'cancel')">
+                            <img src="./images/close.png">
+                        </md-button>
+                    </div>
+                </md-toolbar>
+                <md-dialog-content layout-margin>
+                    <md-input-container class="md-block" layout-padding>
+                        <label>Alarm name</label>
+                        <input type="text" ng-model="alarmName">
+                    </md-input-container>
+                    <md-switch ng-model="isTurnedOn">Turn <span ng-show="isTurnedOn">off</span><span ng-show="!isTurnedOn">on</span></md-switch>
                     <md-tabs md-dynamic-height>
                         <md-tab label="Checkboxes" layout="column" layout-padding>
                             <md-checkbox ng-checked="days.allSelected()"
@@ -24,7 +79,7 @@
                             </md-checkbox>
                             <div layout="row">
                                 <div layout="column"
-                                     ng-repeat="day in days.getValues()" ng-init="short = day.slice(0, 3).toUpperCase()"
+                                     ng-repeat="day in days.getValues()" ng-init="short = cropDay(day)"
                                      layout-align="center center">
                                     <label for="{{short}}">{{short}}</label>
                                     <div style="padding-left: 0.6rem"><md-checkbox ng-model="days[day]" id="{{short}}" aria-label="{{short}}"></md-checkbox></div>
@@ -119,15 +174,12 @@
                     </md-tabs>
                 </md-dialog-content>
                 <md-dialog-actions>
-                    <md-button ng-click="closeDialog($event, 'save')" class="md-primary" md-autofocus>Save alarm</md-button>
-                    <md-button ng-click="closeDialog($event, 'cancel')">Cancel</md-button>
+                    <md-button ng-click="closeDialog($event, 'save')" class="md-primary md-hue-1" md-autofocus>Save alarm</md-button>
+                    <md-button ng-click="closeDialog($event, 'cancelSave')">Cancel</md-button>
                 </md-dialog-actions>
-            </md-dialog-content>
+            </md-dialog>
         </div>
     </div>
-    <md-button class="md-fab" ng-click="openDialog($event)">
-        <img src="./images/add-alarm.png">
-    </md-button>
 </div>
 <script src="./node_modules/angular/angular.js"></script>
 <script src="./node_modules/angular-aria/angular-aria.js"></script>

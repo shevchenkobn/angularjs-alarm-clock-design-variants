@@ -1,3 +1,7 @@
+html, body {
+    height: 100%;
+    max-height: 100%;
+}
 .md-button.md-fab img {
     width: 70%;
     vertical-align: middle;
@@ -5,6 +9,31 @@
 .dialog-template {
     display: none;
 }
-#alarmDialog {
-    min-width: 50%;
+@media (min-width: 959px){
+    #alarmDialog {
+        min-width: 50%;
+    }
+}
+.md-icon-button img {
+    height: 1.8rem;
+}
+#alarmDialog md-input-container {
+    margin-top: 1.5rem;
+}
+.alarm-tile h1 {
+    margin: 0;
+}
+.alarm-tile h3 {
+    padding-left: 1rem;
+}
+.alarm-tile .footer {
+    position: absolute;
+    bottom: 0.6rem;
+    width: 95%
+}
+.alarm-tile .footer .delete {
+    float: right;
+}
+.body-header img {
+    height: 32px;
 }
