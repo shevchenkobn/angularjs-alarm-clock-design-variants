@@ -37,3 +37,6 @@ html, body {
 .body-header img {
     height: 32px;
 }
+.number-min-width {
+    min-width: 3.5rem;
+}

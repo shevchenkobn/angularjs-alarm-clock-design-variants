@@ -4,7 +4,7 @@ angular.module('alarmClock', ['ngMaterial', 'mdPickers'])
     $mdThemingProvider.theme('default')
       .primaryPalette('purple')
       .accentPalette('pink')
-      .warnPalette('light-green')
+      .warnPalette('deep-orange')
       .backgroundPalette('grey');
   })
   .controller('alarmController', alarmController);
