@@ -40,3 +40,9 @@ html, body {
 .number-min-width {
     min-width: 3.5rem;
 }
+.button {
+    cursor: pointer;
+}
+.fixed {
+    position: fixed !important;
+}

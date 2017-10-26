@@ -8,7 +8,7 @@
 </head>
 <body ng-app="alarmClock">
 
-<div ng-controller="alarmController">
+<div ng-controller="alarmController" style="height: 100%">
     <md-toolbar class="body-header">
         <div layout="row" layout-margin>
             <img src="./images/enable-alarm.png">
@@ -16,7 +16,7 @@
         </div>
     </md-toolbar>
 
-    <md-button class="md-fab md-fab-bottom-right" ng-click="openDialog($event, 'new')">
+    <md-button class="md-fab md-fab-bottom-right fixed" ng-click="openDialog($event, 'new')">
         <img src="./images/add-alarm.png">
     </md-button>
     <md-content layout-padding>
@@ -44,8 +44,8 @@
                     </div>
                 </div>
             </md-grid-tile>
-            <md-grid-tile md-colors="{background: 'purple-A100'}" md-whiteframe="6">
-                <md-button class="md-fab" ng-click="openDialog($event, 'new')">
+            <md-grid-tile class="button" md-colors="{background: 'purple-A100'}" md-whiteframe="6" ng-click="openDialog($event, 'new')">
+                <md-button class="md-fab">
                     <img src="./images/add-alarm.png">
                 </md-button>
             </md-grid-tile>
@@ -161,13 +161,13 @@
                             <form name="selectForm" layout="row" layout-padding layout-align="center center">
                                 <md-input-container>
                                     <label>Hours</label>
-                                    <md-select ng-model="hours" placeholder="00">
+                                    <md-select ng-model="hours">
                                         <md-option ng-repeat="num in getHoursRange()" ng-value="num">{{formatNumber(num)}}</md-option>
                                     </md-select>
                                 </md-input-container>
                                 <md-input-container>
                                     <label>Minutes</label>
-                                    <md-select ng-model="minutes" placeholder="00">
+                                    <md-select ng-model="minutes">
                                         <md-option ng-repeat="num in getMinutesRange()" ng-value="num">{{formatNumber(num)}}</md-option>
                                     </md-select>
                                 </md-input-container>
